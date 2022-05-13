@@ -8,6 +8,9 @@ authors = ["nbuzzano <nicolas.buzzano@muttdata.ai>"]
 python = "^3.8"
 kaggle = "^1.5.12"
 tabview = "^1.4.4"
+numpy = "^1.22.3"
+pandas = "^1.4.2"
+lightgbm = "^3.3.2"
 
 [tool.poetry.dev-dependencies]
 
