@@ -1,47 +1,25 @@
 # export PYTHONPATH="${PYTHONPATH}:/home/nbuzzano/repositories/jpx-tokyo-stock-exchange-prediction"
 # https://towardsdatascience.com/how-to-fix-modulenotfounderror-and-importerror-248ce5b69b1c
 
-from predictions.models.base import stock_list, train_prices
-from predictions.models.utils import save_experiment, timer
-
 import pandas as pd
-from datetime import datetime
 from math import sqrt
 
-import lightgbm
-from lightgbm import Dataset 
-from lightgbm import train
+from predictions.models.base import train_prices
+from predictions.models.utils import save_experiment, timer, Feature, build_dataframe
+from predictions.features.sector_code_17 import feature_17_sector_code
+from predictions.features.date import feature_date
 
+from lightgbm import Dataset, train
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, mean_squared_error, roc_auc_score, mean_absolute_error
-# https://github.com/nbuzzano/7506-zonaprop/blob/master/machine-learning/modelos/lightGBM.ipynb
+from sklearn.metrics import mean_absolute_error #, accuracy_score, mean_squared_error, roc_auc_score,
 from sklearn.pipeline import Pipeline # !!!
 
+# https://github.com/nbuzzano/7506-zonaprop/blob/master/machine-learning/modelos/lightGBM.ipynb
 # env = jpx_tokyo_market_prediction.make_env()
 # iter_test = env.iter_test()
 
 
-def load_data(df):
-	# TODO: refactorear esto, deberia crear las features en distintos archivos
-	# para que no se arme bolsa de gatos e importar las features aca 
-	# e ir apendeandolas, asi puedo mayor flexibilidad al armar set de features,
-	# save_experiment tmb deberia guardar que set de features con su version corrio cada modelo.
-	feature_cols = ["Date", "SecuritiesCode", "Open", "High", "Low", "Close", "Volume", "17SectorCode"]
-	
-	_df = df[feature_cols].copy()
-	
-	_df = pd.merge(_df, stock_list[["SecuritiesCode", "17SectorCode"]], on = "SecuritiesCode", how = "left")
-	_df["17SectorCode"] = _df["17SectorCode"].astype("int64")
-	
-	_df['Date'] = pd.to_datetime(_df['Date'])
-	_df['Date'] = _df['Date'].dt.strftime("%Y%m%d").astype(int)
-	
-	target = df["Target"].copy()
-	
-	return _df, target
-
-
-def prepare_data(x_train, x_test, y_train, y_test):
+def prepare_lgbm_datasets(x_train, x_test, y_train, y_test):
     lgb_train = Dataset(x_train,y_train)#,free_raw_data=False)
     lgb_eval = Dataset(x_test,y_test)#,free_raw_data=False)
     return lgb_train,lgb_eval
@@ -76,16 +54,29 @@ def train_model(lgb_train, lgb_eval):
 	return y_test_pred, booster
 
 
-_train_prices = train_prices.sample(n=5, random_state=42)
-x, y = load_data(_train_prices)
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=7)
-lgb_train,lgb_eval = prepare_data(X_train, X_test, y_train, y_test)
+features = [
+	Feature("securities_code", train_prices["SecuritiesCode"], 1),
+	Feature("open", train_prices["Open"], 1),
+	Feature("high", train_prices["High"], 1),
+	Feature("low", train_prices["Low"], 1),
+	Feature("close", train_prices["Close"], 1),
+	Feature("volume", train_prices["Volume"], 1),
+	feature_date,
+	feature_17_sector_code
+]
 
+y = train_prices["Target"].copy()
+x = build_dataframe(features)
+
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=7)
+
+lgb_train,lgb_eval = prepare_lgbm_datasets(X_train, X_test, y_train, y_test)
 y_test_predicted, trained_model = train_model(lgb_train,lgb_eval)
+y_test_target = y_test
 
 save_experiment(
-	'light_gbm', trained_model,
-	y_test_predicted, y_test,
+	'light_gbm', trained_model, features,
+	y_test_predicted, y_test_target,
 	metrics = [
         (mean_absolute_error, "mean_absolute_error"), 
         (lambda x,y: sqrt(mean_absolute_error(x,y)), "RMSE"),
@@ -95,4 +86,5 @@ save_experiment(
 	]
 )
 
+# submit()
 # TODO: FALTA COMPARAR COMO TE PIDE LA COMPETENCIA (los 1eros 200 y las ultimas 200 stocks era?)
