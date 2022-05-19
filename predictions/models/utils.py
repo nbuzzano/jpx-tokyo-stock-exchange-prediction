@@ -81,19 +81,19 @@ def save_experiment(model_name, model, features, y_test_predicted, y_test_target
     print('Done.')
 
 
-import data."jpx-tokyo-stock-exchange-prediction".jpx_tokyo_market_prediction
+# import data."jpx-tokyo-stock-exchange-prediction".jpx_tokyo_market_prediction
 
-def submit(df):
-    _SUBMIT_ENABLED = False
-    if not _SUBMIT_ENABLED:
-        print("Submit not enabled")
-        pass
+# def submit(df):
+#     _SUBMIT_ENABLED = False
+#     if not _SUBMIT_ENABLED:
+#         print("Submit not enabled")
+#         pass
     
-    env = jpx_tokyo_market_prediction.make_env()
-    iter_test = env.iter_test()
-    for (prices, _, _, _, _, submission) in iter_test:
-        # prices["Spread"] = prices.High - prices.Low
-        # prices["Rank"] = prices.groupby("Date")["Spread"].rank(method="first", ascending=False, na_option="bottom").astype(int) - 1
-        submission = submission.drop(columns=["Rank"])
-        submission = submission.merge(prices[["SecuritiesCode", "Rank"]], on="SecuritiesCode", how="inner")
-        env.predict(submission)
+#     env = jpx_tokyo_market_prediction.make_env()
+#     iter_test = env.iter_test()
+#     for (prices, _, _, _, _, submission) in iter_test:
+#         # prices["Spread"] = prices.High - prices.Low
+#         # prices["Rank"] = prices.groupby("Date")["Spread"].rank(method="first", ascending=False, na_option="bottom").astype(int) - 1
+#         submission = submission.drop(columns=["Rank"])
+#         submission = submission.merge(prices[["SecuritiesCode", "Rank"]], on="SecuritiesCode", how="inner")
+#         env.predict(submission)

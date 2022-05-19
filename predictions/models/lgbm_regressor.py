@@ -1,13 +1,21 @@
 # export PYTHONPATH="${PYTHONPATH}:/home/nbuzzano/repositories/jpx-tokyo-stock-exchange-prediction"
 # https://towardsdatascience.com/how-to-fix-modulenotfounderror-and-importerror-248ce5b69b1c
 
-import pandas as pd
 from math import sqrt
 
 from predictions.models.base import train_prices
 from predictions.models.utils import save_experiment, timer, Feature, build_dataframe
 from predictions.features.sector_code_17 import feature_17_sector_code
+from predictions.features.sector_code_33 import feature_33_sector_code
 from predictions.features.date import feature_date
+from predictions.features.volatility import (
+	feature_realized_volatility,
+	feature_parkinson_volatility,
+	feature_garman_klass_volatility,
+	feature_roger_satchell_volatility,
+	feature_yang_zhang_volatility,
+	feature_garkla_yangzh_volatility,
+)
 
 from lightgbm import Dataset, train
 from sklearn.model_selection import train_test_split
@@ -62,7 +70,8 @@ features = [
 	Feature("close", train_prices["Close"], 1),
 	Feature("volume", train_prices["Volume"], 1),
 	feature_date,
-	feature_17_sector_code
+	feature_17_sector_code,
+	feature_33_sector_code
 ]
 
 y = train_prices["Target"].copy()
