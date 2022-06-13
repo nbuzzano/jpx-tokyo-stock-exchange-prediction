@@ -105,6 +105,7 @@ A slight increase of dispersion is observed when number of stocks per date becom
 parece que te aumenta la el desvio standard del target en el mercado a medida que hay mas stock
 
 =============
+
 https://www.kaggle.com/competitions/jpx-tokyo-stock-exchange-prediction/discussion/317395
 
 Section-specific series show that the business activity in prime market is more vigorous than the others. Following are just two examples for illustration
@@ -122,3 +123,7 @@ https://www.kaggle.com/code/lucasmorin/jpx-macro-data-from-public-apis/notebook
 https://www.kaggle.com/code/bowaka/jpx-buying-strategy-backtest/notebook
 
 https://www.kaggle.com/code/satoshidatamoto/jpx-volatility-features/notebook
+
+========================================
+ 
+SEGUIR CON CREAR LAS FEATURES QUE PASE EN EL CANAL DE SLACK

@@ -1,8 +1,0 @@
-feature name: securities_code, version: 1
-feature name: open, version: 1
-feature name: high, version: 1
-feature name: low, version: 1
-feature name: close, version: 1
-feature name: volume, version: 1
-feature name: date, version: 1
-feature name: 17_sector_code, version: 1
